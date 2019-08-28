@@ -42,7 +42,7 @@ export class Credential {
    * @example `console.log(credential.claim) // { id: 'did:jolo:abcde', name: 'Example' }`
    */
 
-  @Expose()
+  @Expose({ name: 'credentialSubject', since: 1.0 })
   get claim(): IClaimSection {
     return this._claim
   }
