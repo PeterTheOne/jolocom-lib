@@ -23,6 +23,7 @@ import {
   IDigestable,
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
+import base64url from 'base64url'
 
 /**
  * Class modelling a Did Document
@@ -297,7 +298,7 @@ export class DidDocument implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-      return digestJsonLd(this.toJSON(), this.context)
+    return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**
@@ -315,5 +316,24 @@ export class DidDocument implements IDigestable {
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
     return plainToClass(DidDocument, json)
+  }
+
+  /*
+   * @description - Encodes the class as a base64 encoded string
+   * @returns {string} - base64 encoded DID Document
+   */
+
+  public encode(): string {
+    return base64url.encode(JSON.stringify(this.toJSON()))
+  }
+
+  /*
+   * @description - Decodes a base64 encoded JWT and instantiates this class based on content
+   * @param jwt - base64 encoded JWT string
+   * @returns {Object} - Instance of DidDocument class
+   */
+
+  public static decode(jwt: string): DidDocument {
+    return DidDocument.fromJSON(JSON.parse(base64url.decode(jwt)))
   }
 }
