@@ -502,6 +502,7 @@ export class IdentityWallet {
     derivationPath: string,
     pass: string,
     receivedJWT?: JSONWebToken<T>,
+    inlineDDO?: boolean,
   ) {
     if (receivedJWT) {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
@@ -510,7 +511,8 @@ export class IdentityWallet {
       jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
     }
 
-    jwt.issuer = this.publicKeyMetadata.keyId
+    if (inlineDDO) jwt.issuer = this.didDocument.encode()
+    else jwt.issuer = this.publicKeyMetadata.keyId
 
     const signature = await this.vaultedKeyProvider.signDigestable(
       { derivationPath, encryptionPass: pass },
