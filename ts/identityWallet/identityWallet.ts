@@ -41,6 +41,7 @@ import {
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
+import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -511,8 +512,11 @@ export class IdentityWallet {
       jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
     }
 
-    if (inlineDDO) jwt.issuer = this.didDocument.encode()
-    else jwt.issuer = this.publicKeyMetadata.keyId
+    if (inlineDDO) {
+      jwt.inlineDidDocument = this.didDocument.encode()
+    }
+
+    jwt.issuer = this.publicKeyMetadata.keyId
 
     const signature = await this.vaultedKeyProvider.signDigestable(
       { derivationPath, encryptionPass: pass },
@@ -536,9 +540,11 @@ export class IdentityWallet {
     customRegistry?: IRegistry,
   ): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
-    const remoteIdentity = await registry.resolve(
-      keyIdToDid(receivedJWT.issuer),
-    )
+    const remoteIdentity = await (receivedJWT.inlineDidDocument
+      ? Identity.fromDidDocument({
+          didDocument: DidDocument.decode(receivedJWT.inlineDidDocument),
+        })
+      : registry.resolve(keyIdToDid(receivedJWT.issuer)))
     const pubKey = getIssuerPublicKey(
       receivedJWT.issuer,
       remoteIdentity.didDocument,

@@ -48,6 +48,7 @@ interface IPayloadSection<T> {
   aud?: string
   typ?: InteractionType
   interactionToken?: T
+  inlineDDO?: string
 }
 
 interface TransformArgs {
@@ -148,6 +149,14 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   set interactionType(type) {
     this.payload.typ = type
+  }
+
+  get inlineDidDocument() {
+    return this.payload.inlineDDO
+  }
+
+  set inlineDidDocument(ddo) {
+    this.payload.inlineDDO = ddo
   }
 
   @Expose()
