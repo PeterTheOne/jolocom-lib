@@ -56,6 +56,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       },
       userPass,
       decodedAuthRequest,
+      true,
     )
     authResponseEncoded = authResponseJWT.encode()
 
