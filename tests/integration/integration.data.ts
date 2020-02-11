@@ -1,5 +1,6 @@
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { claimsMetadata } from 'cred-types-jolocom-core'
+import { randomBytes } from 'crypto'
 
 /* Local configuration for ganache server. the contract address is deterministic */
 export const testEthereumConfig = {
@@ -31,6 +32,13 @@ export const userVault = SoftwareKeyProvider.fromSeed(userSeed, userPass)
 /* The private eth key derived from the user's seed */
 export const userEthKey =
   '0x58b03b7b5a44f763fa3387dd68dc9552b31ebff0086fd9d85a202f960e46f315'
+
+export const unanchoredSeed = randomBytes(32)
+export const unanchoredPass = userPass
+export const unanchoredVault = SoftwareKeyProvider.fromSeed(
+  unanchoredSeed,
+  unanchoredPass,
+)
 
 /* The seed for instantiating the service's vault */
 const serviceSeed = Buffer.from(

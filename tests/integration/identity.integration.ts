@@ -18,11 +18,15 @@ import {
   userPass,
   serviceVault,
   servicePass,
+  unanchoredVault,
+  unanchoredPass,
 } from './integration.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { Identity } from '../../ts/identity/identity'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -30,6 +34,7 @@ const expect = chai.expect
 /* global before and after hook for integration tests & shared variables */
 export let jolocomRegistry: JolocomRegistry
 export let userIdentityWallet: IdentityWallet
+export let unanchoredIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
 export let testContractsAdapter: ContractsAdapter
@@ -54,6 +59,33 @@ before(async () => {
     serviceVault,
     servicePass,
   )
+
+  const derivationArgs = {
+    derivationPath: KeyTypes.jolocomIdentityKey,
+    encryptionPass: unanchoredPass,
+  }
+
+  const publicIdentityKey = unanchoredVault.getPublicKey(derivationArgs)
+
+  const didDocument = DidDocument.fromPublicKey(publicIdentityKey)
+  const didDocumentSignature = await unanchoredVault.signDigestable(
+    derivationArgs,
+    didDocument,
+  )
+
+  didDocument.signature = didDocumentSignature.toString('hex')
+  const identity = Identity.fromDidDocument({ didDocument })
+
+  unanchoredIdentityWallet = new IdentityWallet({
+    identity,
+    vaultedKeyProvider: unanchoredVault,
+    publicKeyMetadata: {
+      derivationPath: KeyTypes.jolocomIdentityKey,
+      keyId: didDocument.publicKey[0].id,
+    },
+    contractsAdapter: testContractsAdapter,
+    contractsGateway: testContractsGateway,
+  })
 })
 
 after(() => {

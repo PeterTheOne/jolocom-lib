@@ -9,6 +9,7 @@ import {
   userIdentityWallet,
   serviceIdentityWallet,
   jolocomRegistry,
+  unanchoredIdentityWallet,
 } from './identity.integration'
 
 chai.use(sinonChai)
@@ -33,7 +34,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     expect(authRequestJWT.interactionToken).to.be.instanceOf(Authentication)
   })
 
-  it('Should allow for consumption of valid authentication request token by user', async () => {
+  it('Should allow for consumption of valid authentication request token by anchored user', async () => {
     const decodedAuthRequest = JSONWebToken.decode<Authentication>(
       authRequestEncoded,
     )
@@ -56,7 +57,6 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       },
       userPass,
       decodedAuthRequest,
-      true,
     )
     authResponseEncoded = authResponseJWT.encode()
 
@@ -68,6 +68,59 @@ describe('Integration Test - Token interaction flow Authentication', () => {
   })
 
   it('Should allow for consumption of valid authentication response token by service', async () => {
+    const decodedAuthResponse = JSONWebToken.decode<Authentication>(
+      authResponseEncoded,
+    )
+    expect(decodedAuthResponse.interactionToken).to.be.instanceOf(
+      Authentication,
+    )
+
+    try {
+      await serviceIdentityWallet.validateJWT(
+        decodedAuthResponse,
+        authRequestJWT,
+        jolocomRegistry,
+      )
+    } catch (err) {
+      return expect(true).to.be.false
+    }
+  })
+
+  it('Should allow for consumption of valid authentication request token by unanchored user', async () => {
+    const decodedAuthRequest = JSONWebToken.decode<Authentication>(
+      authRequestEncoded,
+    )
+    expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
+
+    try {
+      await unanchoredIdentityWallet.validateJWT(
+        decodedAuthRequest,
+        null,
+        jolocomRegistry,
+      )
+    } catch (err) {
+      return expect(true).to.be.false
+    }
+
+    const authResponseJWT = await unanchoredIdentityWallet.create.interactionTokens.response.auth(
+      {
+        callbackURL: decodedAuthRequest.interactionToken.callbackURL,
+        description: decodedAuthRequest.interactionToken.description,
+      },
+      userPass,
+      decodedAuthRequest,
+      true,
+    )
+    authResponseEncoded = authResponseJWT.encode()
+
+    expect(authResponseJWT.interactionToken).to.be.instanceOf(Authentication)
+    expect(authResponseJWT.nonce).to.eq(decodedAuthRequest.nonce)
+    expect(authResponseJWT.audience).to.eq(
+      keyIdToDid(decodedAuthRequest.issuer),
+    )
+  })
+
+  it('Should allow for consumption of valid inline-DDO authentication response token by service', async () => {
     const decodedAuthResponse = JSONWebToken.decode<Authentication>(
       authResponseEncoded,
     )
