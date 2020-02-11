@@ -42,6 +42,7 @@ import {
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
 import { DidDocument } from '../identity/didDocument/didDocument'
+import { publicKeyToDID } from '../utils/crypto'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -545,6 +546,7 @@ export class IdentityWallet {
           didDocument: DidDocument.decode(receivedJWT.inlineDidDocument),
         })
       : registry.resolve(keyIdToDid(receivedJWT.issuer)))
+
     const pubKey = getIssuerPublicKey(
       receivedJWT.issuer,
       remoteIdentity.didDocument,
@@ -564,6 +566,13 @@ export class IdentityWallet {
 
     if (receivedJWT.expires < Date.now()) {
       throw new Error('Token expired')
+    }
+
+    if (
+      receivedJWT.inlineDidDocument &&
+      publicKeyToDID(pubKey) !== remoteIdentity.did
+    ) {
+      throw new Error('Inline DID Document not Authoritative')
     }
   }
 
