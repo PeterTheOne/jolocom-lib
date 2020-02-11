@@ -266,6 +266,7 @@ export class IdentityWallet {
     >,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>,
+    inlineDDO?: boolean,
   ) => {
     const authenticationReq = Authentication.fromJSON({
       description: 'Authorize the transaction',
@@ -281,6 +282,7 @@ export class IdentityWallet {
       this.publicKeyMetadata.derivationPath,
       pass,
       receivedJWT,
+      inlineDDO,
     )
   }
 
@@ -293,6 +295,7 @@ export class IdentityWallet {
   private createCredOfferRequest = async (
     credOffer: WithExtraOptions<CredentialOfferRequestAttrs>,
     pass: string,
+    inlineDDO?: boolean,
   ) => {
     const offer = CredentialOfferRequest.fromJSON(credOffer)
     const jwt = JSONWebToken.fromJWTEncodable(offer)
@@ -303,6 +306,8 @@ export class IdentityWallet {
       jwt,
       this.publicKeyMetadata.derivationPath,
       pass,
+      undefined,
+      inlineDDO,
     )
   }
 
@@ -317,6 +322,7 @@ export class IdentityWallet {
     credentialOfferResponse: WithExtraOptions<CredentialOfferResponseAttrs>,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>,
+    inlineDDO?: boolean,
   ) => {
     const offerResponse = CredentialOfferResponse.fromJSON(
       credentialOfferResponse,
@@ -332,6 +338,7 @@ export class IdentityWallet {
       this.publicKeyMetadata.derivationPath,
       pass,
       receivedJWT,
+      inlineDDO,
     )
   }
 
@@ -344,6 +351,7 @@ export class IdentityWallet {
   private createCredReq = async (
     credReq: WithExtraOptions<ICredentialRequestAttrs>,
     pass: string,
+    inlineDDO?: boolean,
   ) => {
     const credentialRequest = CredentialRequest.fromJSON(credReq)
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
@@ -353,6 +361,8 @@ export class IdentityWallet {
       jwt,
       this.publicKeyMetadata.derivationPath,
       pass,
+      undefined,
+      inlineDDO,
     )
   }
 
@@ -367,6 +377,7 @@ export class IdentityWallet {
     credResp: WithExtraOptions<ICredentialResponseAttrs>,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
+    inlineDDO?: boolean,
   ) => {
     const credentialResponse = CredentialResponse.fromJSON(credResp)
     const jwt = JSONWebToken.fromJWTEncodable(credentialResponse)
@@ -378,6 +389,7 @@ export class IdentityWallet {
       this.publicKeyMetadata.derivationPath,
       pass,
       receivedJWT,
+      inlineDDO,
     )
   }
 
@@ -392,6 +404,7 @@ export class IdentityWallet {
     credReceive: WithExtraOptions<ICredentialsReceiveAttrs>,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
+    inlineDDO?: boolean,
   ) => {
     const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
     const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
@@ -402,6 +415,7 @@ export class IdentityWallet {
       this.publicKeyMetadata.derivationPath,
       pass,
       receivedJWT,
+      inlineDDO,
     )
   }
 
@@ -439,6 +453,7 @@ export class IdentityWallet {
   private createPaymentReq = async (
     paymentReq: WithExtraOptions<PaymentRequestCreationArgs>,
     pass: string,
+    inlineDDO?: boolean,
   ) => {
     const { transactionOptions } = paymentReq
 
@@ -463,6 +478,8 @@ export class IdentityWallet {
       jwt,
       this.publicKeyMetadata.derivationPath,
       pass,
+      undefined,
+      inlineDDO,
     )
   }
 
@@ -477,6 +494,7 @@ export class IdentityWallet {
     paymentResp: WithExtraOptions<IPaymentResponseAttrs>,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
+    inlineDDO?: boolean,
   ) => {
     const paymentResponse = PaymentResponse.fromJSON(
       paymentResp,
@@ -488,6 +506,7 @@ export class IdentityWallet {
       this.publicKeyMetadata.derivationPath,
       pass,
       receivedJWT,
+      inlineDDO,
     )
   }
 
