@@ -19,6 +19,7 @@ interface IPayloadSection<T> {
     aud?: string;
     typ?: InteractionType;
     interactionToken?: T;
+    inlineDDO?: string;
 }
 export declare class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     private _header;
@@ -33,6 +34,7 @@ export declare class JSONWebToken<T extends JWTEncodable> implements IDigestable
     nonce: string;
     interactionToken: T;
     interactionType: InteractionType;
+    inlineDidDocument: string;
     header: IJWTHeader;
     readonly signer: {
         did: string;

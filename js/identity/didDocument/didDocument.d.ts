@@ -30,4 +30,6 @@ export declare class DidDocument implements IDigestable {
     digest(): Promise<Buffer>;
     toJSON(): IDidDocumentAttrs;
     static fromJSON(json: IDidDocumentAttrs): DidDocument;
+    encode(): string;
+    static decode(jwt: string): DidDocument;
 }

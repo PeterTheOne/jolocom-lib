@@ -12,6 +12,7 @@ import { ITransactionEncodable } from '../contracts/types';
 import { IRegistry } from '../registries/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentRequestAttrs, IPaymentResponseAttrs } from '../interactionTokens/interactionTokens.types';
+import { DidDocument } from '../identity/didDocument/didDocument';
 interface PaymentRequestCreationArgs {
     callbackURL: string;
     description: string;
@@ -31,7 +32,7 @@ export declare class IdentityWallet {
     private _contractsGateway;
     did: string;
     identity: Identity;
-    didDocument: import("../identity/didDocument/didDocument").DidDocument;
+    didDocument: DidDocument;
     publicKeyMetadata: IKeyMetadata;
     private vaultedKeyProvider;
     constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter, }: IIdentityWalletCreateArgs);
@@ -56,17 +57,17 @@ export declare class IdentityWallet {
         signedCredential: <T extends BaseMetadata>({ expires, ...credentialParams }: WithExtraOptions<ISignedCredCreationArgs<T>>, pass: string) => Promise<SignedCredential>;
         interactionTokens: {
             request: {
-                auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                offer: (credOffer: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<CredentialOfferRequest>>;
-                share: (credReq: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<CredentialRequest>>;
-                payment: (paymentReq: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<PaymentRequest>>;
+                auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>, inlineDDO?: boolean) => Promise<JSONWebToken<JWTEncodable>>;
+                offer: (credOffer: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string, inlineDDO?: boolean) => Promise<JSONWebToken<CredentialOfferRequest>>;
+                share: (credReq: WithExtraOptions<ICredentialRequestAttrs>, pass: string, inlineDDO?: boolean) => Promise<JSONWebToken<CredentialRequest>>;
+                payment: (paymentReq: WithExtraOptions<PaymentRequestCreationArgs>, pass: string, inlineDDO?: boolean) => Promise<JSONWebToken<PaymentRequest>>;
             };
             response: {
-                auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                offer: (credentialOfferResponse: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                share: (credResp: WithExtraOptions<ICredentialResponseAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                issue: (credReceive: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                payment: (paymentResp: WithExtraOptions<IPaymentResponseAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
+                auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>, inlineDDO?: boolean) => Promise<JSONWebToken<JWTEncodable>>;
+                offer: (credentialOfferResponse: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>, inlineDDO?: boolean) => Promise<JSONWebToken<JWTEncodable>>;
+                share: (credResp: WithExtraOptions<ICredentialResponseAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>, inlineDDO?: boolean) => Promise<JSONWebToken<JWTEncodable>>;
+                issue: (credReceive: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>, inlineDDO?: boolean) => Promise<JSONWebToken<JWTEncodable>>;
+                payment: (paymentResp: WithExtraOptions<IPaymentResponseAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>, inlineDDO?: boolean) => Promise<JSONWebToken<JWTEncodable>>;
             };
         };
     };
