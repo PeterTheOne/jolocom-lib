@@ -1,6 +1,7 @@
 /* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 
 export const defaultContext = [
+  'https://www.w3.org/2018/credentials/v1',
   {
     id: '@id',
     type: '@type',
