@@ -126,7 +126,7 @@ export class SignedCredential implements IDigestable {
    * @example `console.log(signedCredential.issued) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose()
+  @Expose({ name: 'issuanceDate' })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
@@ -199,7 +199,7 @@ export class SignedCredential implements IDigestable {
    * @example `console.log(signedCredential.expires) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose()
+  @Expose({ name: 'expirationDate' })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
@@ -263,7 +263,7 @@ export class SignedCredential implements IDigestable {
    * @example `console.log(signedCredential.claim) // { id: 'did:jolo:abcde', name: 'Example' }`
    */
 
-  @Expose()
+  @Expose({ name: 'credentialSubject' })
   get claim(): IClaimSection {
     return this._claim
   }
