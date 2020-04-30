@@ -90,7 +90,8 @@
     "reflect-metadata": "^0.1.13",
     "secrets.js-grempe": "^1.1.0",
     "sinon-chai": "^3.3.0",
-    "tiny-secp256k1": "^1.0.1"
+    "tiny-secp256k1": "^1.0.1",
+    "vkp-rs": "^0.1.0"
   },
   "devDependencies": {
     "@types/bip39": "^2.4.2",

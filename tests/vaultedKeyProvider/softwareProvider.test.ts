@@ -3,6 +3,7 @@ import * as crypto from 'crypto'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { WasmKeyProvider } from '../../ts/vaultedKeyProvider/wasmProvider'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
   testSeed,

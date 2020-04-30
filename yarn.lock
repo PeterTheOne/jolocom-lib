@@ -8703,6 +8703,11 @@ vise@2.x.x:
   dependencies:
     hoek "4.x.x"
 
+vkp-rs@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/vkp-rs/-/vkp-rs-0.1.0.tgz#49725b7ade776e20c4ae4db0d8ab136b6fa48a32"
+  integrity sha512-wzfpzJRFNmKjwHM7Dk0JfoGRCWTCFGry3JF3uuwUkBCoRhunUrtnwZywi71jXdCJ5oN2uogVb3TYqVtZN92AJg==
+
 web3-bzz@1.0.0-beta.29:
   version "1.0.0-beta.29"
   resolved "https://registry.yarnpkg.com/web3-bzz/-/web3-bzz-1.0.0-beta.29.tgz#c40555ce3281f637fc5f5c83dc7b08cbeef42b72"
