@@ -20,6 +20,8 @@ import { PaymentResponse } from './paymentResponse'
 import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
+import { Generic } from './genericToken'
+import { IGenericAttrs } from './interactionTokens.types'
 import { ErrorCodes } from '../errors'
 
 // JWTs are valid for one hour by default
@@ -36,6 +38,7 @@ export type JWTEncodable =
   | CredentialsReceive
   | PaymentRequest
   | PaymentResponse
+  | Generic
 
 interface IJWTEncodable {
   [key: string]: any
@@ -305,6 +308,8 @@ const instantiateInteraction = <T extends JWTEncodable>(
       return instantiator(PaymentRequest)
     case InteractionType.PaymentResponse:
       return instantiator(PaymentResponse)
+    case InteractionType.Generic:
+      return instantiator(Generic)
   }
   throw new Error(ErrorCodes.JWTInvalidInteractionType)
 }

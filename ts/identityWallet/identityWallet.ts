@@ -10,6 +10,7 @@ import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
+import { Generic } from '../interactionTokens/genericToken'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
 import {
@@ -40,6 +41,7 @@ import {
   ICredentialsReceiveAttrs,
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
+  IGenericAttrs,
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 
@@ -402,6 +404,23 @@ export class IdentityWallet {
     )
   }
 
+  private createGeneric = async <T, R>(
+    body: WithExtraOptions<IGenericAttrs<T>>,
+    pass: string,
+    receivedJWT?: JSONWebToken<Generic<R>>,
+  ) => {
+    const generic = Generic.fromJSON(body)
+    const jwt = JSONWebToken.fromJWTEncodable(generic)
+    jwt.interactionType = InteractionType.Generic
+    jwt.timestampAndSetExpiry(body.expires)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT,
+    )
+  }
+
   /**
    * Derives all public keys listed in the {@link KeyTypes} enum
    * @param encryptionPass - password for interfacing with the vaulted key provider
@@ -496,11 +515,14 @@ export class IdentityWallet {
    * @param receivedJWT - optional received JSONWebToken Class
    */
 
-  private async initializeAndSign<T extends JWTEncodable>(
+  private async initializeAndSign<
+    T extends JWTEncodable,
+    R extends JWTEncodable
+  >(
     jwt: JSONWebToken<T>,
     derivationPath: string,
     pass: string,
-    receivedJWT?: JSONWebToken<T>,
+    receivedJWT?: JSONWebToken<R>,
   ) {
     if (receivedJWT) {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
@@ -595,6 +617,7 @@ export class IdentityWallet {
         offer: this.createCredOfferRequest,
         share: this.createCredReq,
         payment: this.createPaymentReq,
+        generic: this.createGeneric,
       },
       response: {
         auth: this.createAuth,
@@ -602,6 +625,7 @@ export class IdentityWallet {
         share: this.createCredResp,
         issue: this.createCredReceive,
         payment: this.createPaymentResp,
+        generic: this.createGeneric,
       },
     },
   }
