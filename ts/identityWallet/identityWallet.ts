@@ -404,9 +404,9 @@ export class IdentityWallet {
   }
 
   private createGeneric = async <T, R>(
-    body: WithExtraOptions<Generic<T>>,
+    body: WithExtraOptions<IGenericAttrs<T>>,
     pass: string,
-    receivedJWT: JSONWebToken<Generic<R>>,
+    receivedJWT: JSONWebToken<IGenericAttrs<R>>,
   ) => {
     const generic = Generic.fromJSON(body)
     const jwt = JSONWebToken.fromJWTEncodable(generic)
