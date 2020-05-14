@@ -87,6 +87,11 @@ export interface IAuthenticationAttrs {
   description: string
 }
 
+export interface IGenericAttrs<T = {}> {
+  body: T
+  callbackURL: string
+}
+
 /* Related to constraint functions */
 
 export type Operator = '==' | '!=' | '<' | '>'
