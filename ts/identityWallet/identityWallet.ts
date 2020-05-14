@@ -41,6 +41,7 @@ import {
   ICredentialsReceiveAttrs,
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
+  IGenericAttrs,
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 
@@ -404,9 +405,9 @@ export class IdentityWallet {
   }
 
   private createGeneric = async <T, R>(
-    body: WithExtraOptions<IGenericAttrs<T>>,
+    body: WithExtraOptions<Generic<T>>,
     pass: string,
-    receivedJWT: JSONWebToken<IGenericAttrs<R>>,
+    receivedJWT: JSONWebToken<Generic<R>>,
   ) => {
     const generic = Generic.fromJSON(body)
     const jwt = JSONWebToken.fromJWTEncodable(generic)
@@ -616,6 +617,7 @@ export class IdentityWallet {
         offer: this.createCredOfferRequest,
         share: this.createCredReq,
         payment: this.createPaymentReq,
+        generic: this.createGeneric,
       },
       response: {
         auth: this.createAuth,
@@ -623,6 +625,7 @@ export class IdentityWallet {
         share: this.createCredResp,
         issue: this.createCredReceive,
         payment: this.createPaymentResp,
+        generic: this.createGeneric,
       },
     },
   }
