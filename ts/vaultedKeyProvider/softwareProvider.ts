@@ -264,6 +264,24 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
+   * Encrypts data asymmetrically
+   * @param pubKey - The key to encrypt to
+   * @param data - The data to encrypt
+   */
+  public static asymEncrypt(pubKey: Buffer, data: Buffer): Buffer {
+    return eccrypto.encrypt(pubKey, data)
+  }
+
+  /**
+   * Decrypts data asymmetrically
+   * @param privKey - The decryption private key
+   * @param data - The data to decrypt
+   */
+  public static asymDecrypt(privKey: Buffer, data: Buffer): Buffer {
+    return eccrypto.decrypt(privKey, data)
+  }
+
+  /**
    * Encrypts data based on the hybrid encryption scheme of PGP. This means that
    * the data will first be encrypted with a freshly generated symmetric key and
    * afterwards this key is encrypted with the public key in an asymmetric manner
