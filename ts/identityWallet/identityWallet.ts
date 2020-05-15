@@ -429,6 +429,20 @@ export class IdentityWallet {
     return this.vaultedKeyProvider.asymEncrypt(publicKey, data)
   }
 
+  public asymEncryptToDidKey = async (
+    data: Buffer,
+    keyRef: string,
+    customRegistry?: IRegistry,
+  ) => {
+    const registry = customRegistry || createJolocomRegistry()
+    const target = await registry.resolve(keyIdToDid(keyRef))
+
+    return this.asymEncrypt(
+      getIssuerPublicKey(keyRef, target.didDocument),
+      data,
+    )
+  }
+
   public asymDecrypt = async (
     cipher: Buffer,
     decryptionKeyArgs: IKeyDerivationArgs,
