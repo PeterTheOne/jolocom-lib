@@ -421,6 +421,17 @@ export class IdentityWallet {
     )
   }
 
+  public asymEncrypt = async (data: Buffer, publicKey: Buffer) => {
+    return this.vaultedKeyProvider.asymEncrypt(publicKey, data)
+  }
+
+  public asymDecrypt = async (
+    cipher: Buffer,
+    decryptionKeyArgs: IKeyDerivationArgs,
+  ) => {
+    return this.vaultedKeyProvider.asymDecrypt(decryptionKeyArgs, cipher)
+  }
+
   /**
    * Derives all public keys listed in the {@link KeyTypes} enum
    * @param encryptionPass - password for interfacing with the vaulted key provider
