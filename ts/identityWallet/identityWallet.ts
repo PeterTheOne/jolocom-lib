@@ -12,7 +12,11 @@ import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { Generic } from '../interactionTokens/genericToken'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
+import {
+  IVaultedKeyProvider,
+  KeyTypes,
+  IKeyDerivationArgs,
+} from '../vaultedKeyProvider/types'
 import {
   IKeyMetadata,
   ISignedCredCreationArgs,

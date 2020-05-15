@@ -268,7 +268,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param pubKey - The key to encrypt to
    * @param data - The data to encrypt
    */
-  public static async asymEncrypt(pubKey: Buffer, data: Buffer): Buffer {
+  public async asymEncrypt(pubKey: Buffer, data: Buffer): Promise<Buffer> {
     return eccrypto.encrypt(pubKey, data)
   }
 
@@ -280,7 +280,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   public async asymDecrypt(
     derivationArgs: IKeyDerivationArgs,
     data: Buffer,
-  ): Buffer {
+  ): Promise<Buffer> {
     const decKey = this.getPrivateKey(derivationArgs)
     return eccrypto.decrypt(decKey, data)
   }

@@ -13,6 +13,11 @@ export interface IVaultedKeyProvider {
     derivationArgs: IKeyDerivationArgs,
     toSign: IDigestable,
   ) => Promise<Buffer>
+  asymEncrypt: (pubKey: Buffer, data: Buffer) => Promise<Buffer>
+  asymDecrypt: (
+    derivationArgs: IKeyDerivationArgs,
+    data: Buffer,
+  ) => Promise<Buffer>
 }
 
 export interface IKeyDerivationArgs {
