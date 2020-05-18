@@ -444,10 +444,10 @@ export class IdentityWallet {
   }
 
   public asymDecrypt = async (
-    cipher: Buffer,
+    data: string,
     decryptionKeyArgs: IKeyDerivationArgs,
   ) => {
-    return this.vaultedKeyProvider.asymDecrypt(decryptionKeyArgs, cipher)
+    return this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
   }
 
   /**
@@ -552,7 +552,7 @@ export class IdentityWallet {
     derivationPath: string,
     pass: string,
     receivedJWT?: JSONWebToken<R>,
-  ) {
+  ): Promise<JSONWebToken<T>> {
     if (receivedJWT) {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
       jwt.nonce = receivedJWT.nonce

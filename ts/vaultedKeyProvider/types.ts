@@ -13,10 +13,10 @@ export interface IVaultedKeyProvider {
     derivationArgs: IKeyDerivationArgs,
     toSign: IDigestable,
   ) => Promise<Buffer>
-  asymEncrypt: (pubKey: Buffer, data: Buffer) => Promise<Buffer>
+  asymEncrypt: (data: Buffer, pubKey: Buffer) => Promise<string>
   asymDecrypt: (
+    data: string,
     derivationArgs: IKeyDerivationArgs,
-    data: Buffer,
   ) => Promise<Buffer>
 }
 

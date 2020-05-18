@@ -268,8 +268,8 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param pubKey - The key to encrypt to
    * @param data - The data to encrypt
    */
-  public async asymEncrypt(pubKey: Buffer, data: Buffer): Promise<Buffer> {
-    return eccrypto.encrypt(pubKey, data)
+  public async asymEncrypt(pubKey: Buffer, data: Buffer): Promise<string> {
+    return this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data))
   }
 
   /**
@@ -278,11 +278,12 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param data - The data to decrypt
    */
   public async asymDecrypt(
+    data: string,
     derivationArgs: IKeyDerivationArgs,
-    data: Buffer,
   ): Promise<Buffer> {
     const decKey = this.getPrivateKey(derivationArgs)
-    return eccrypto.decrypt(decKey, data)
+    const dataObj = this.parseEncryptedData(data)
+    return eccrypto.decrypt(decKey, dataObj)
   }
 
   /**
@@ -309,11 +310,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     // Encrypt asymmetrically
-    const encryptedKey = await eccrypto.encrypt(publicKey, symKey)
+    const encryptedKey = await this.asymEncrypt(publicKey, symKey)
     return {
       keys: [
         {
-          cipher: this.stringifyEncryptedData(encryptedKey),
+          cipher: encryptedKey,
           pubKey: publicKey.toString('hex'),
         },
       ],
@@ -331,7 +332,6 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     derivationArg: IKeyDerivationArgs,
   ): Promise<object> {
     const publicKey = this.getPublicKey(derivationArg)
-    const privateKey = this.getPrivateKey(derivationArg)
     // find encrypted key
     const encryptedKey = encryptedData.keys.find(
       key => key.pubKey === publicKey.toString('hex'),
@@ -341,10 +341,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     // decrypt asymmetrically
     // FIXME We are using a fork of eccrypto to fix a bug in eccrypto.decrypt() see https://github.com/jolocom/jolocom-lib/issues/384
     //  change this back once this https://github.com/bitchan/eccrypto/pull/47 is released
-    const symKey = await eccrypto.decrypt(
-      privateKey,
-      this.parseEncryptedData(encryptedKey.cipher),
-    )
+    const symKey = await this.asymDecrypt(encryptedKey.cipher, derivationArg)
 
     // decrypt symmetrically
     const encryptedDataBuffer = Buffer.from(encryptedData.data, 'hex')
