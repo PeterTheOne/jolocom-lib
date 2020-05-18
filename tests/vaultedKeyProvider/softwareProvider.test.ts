@@ -321,8 +321,8 @@ describe('Software Vaulted Key Provider', () => {
       console.log(`original:  ${data.toString('base64')}`)
 
       const enc = await vault.asymEncrypt(
-        data,
         vault.getPublicKey(keyDerivationArgs),
+        data,
       )
       console.log(`encrypted: ${enc}`)
 
@@ -330,8 +330,8 @@ describe('Software Vaulted Key Provider', () => {
 
       console.log(`decrypted: ${dec.toString('base64')}`)
 
-      expect(dec).to.eq(data)
-      expect(enc).to.not.eq(data)
+      expect(dec.toString('base64')).to.eq(data.toString('base64'))
+      expect(enc).to.not.eq(data.toString('base64'))
     })
     describe('Buffer decoding/encoding', () => {
       const data = {
