@@ -1,4 +1,5 @@
-import { TEMP_EVENT } from "./icp"
+import { TEMP_EVENT } from './icp'
+import { DidDocument } from '../../didDocument/didDocument'
 
 export class KEL {
   private events: TEMP_EVENT[] = []
@@ -18,10 +19,15 @@ export class KEL {
     }
   }
 
+  // TODO
+  toDidDocument(): DidDocument {
+    return DidDocument.fromPrefix(this.keyState.keys[0])
+  }
+
   private apply(ev: TEMP_EVENT) {
     this.keyState = {
       keys: ev.keys,
-      threshold: ev.sith
+      threshold: ev.sith,
     }
 
     this.events.push(ev)

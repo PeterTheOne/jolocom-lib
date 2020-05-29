@@ -1,3 +1,4 @@
+import base64url from 'base64url'
 import {
   plainToClass,
   classToPlain,
@@ -267,11 +268,47 @@ export class DidDocument implements IDigestable {
     didDocument.addPublicKeySection(
       PublicKeySection.fromEcdsa(publicKey, keyId, did),
     )
+
     didDocument.addAuthSection(
       AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
     )
-    didDocument.prepareSignature(keyId)
 
+    didDocument.prepareSignature(keyId)
+    return didDocument
+  }
+
+  /**
+   * @dev This is a temporary, test method, identical to the one above but does not assume a jolo DID
+   * Instantiates a barebones {@link DidDocument} class based on a KERI prefix
+   * @param prefix - A base64 encoded KERI prefix, for now the codec is only allowed to be "G"
+   * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
+   */
+
+  public static fromPrefix(prefix: string): DidDocument {
+    const supportedCodecs = ['G'] // G - ECDSA secp256k1 verification key non-transferable, basic derivation.
+
+    if (!supportedCodecs.includes(prefix[0])) {
+      throw new Error('TODO, currently only the 1 char secp2561k codec (G) is supported')
+    }
+
+    const did = `did:un:${prefix}`
+    const keyId = `${did}#keys-1`
+
+    const didDocument = new DidDocument()
+    didDocument.did = did
+    didDocument.addPublicKeySection(
+      PublicKeySection.fromEcdsa(
+        base64url.toBuffer(prefix.slice(1, prefix.length)),
+        keyId,
+        did
+      )
+    )
+
+    didDocument.addAuthSection(
+      AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
+    )
+
+    didDocument.prepareSignature(keyId)
     return didDocument
   }
 

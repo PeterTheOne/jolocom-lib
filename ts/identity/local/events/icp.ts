@@ -3,15 +3,15 @@
 
 const ICP_header = {
   vs: 'KERI_json_00fe_1.0',
-  id: 'AXq5YqaL6L48pf0fu7IUhL0JRaU2_RxFP0AL43wYn148',
-  sn: 0, // TODO HEX number
+  id: 'GA6NLmfIseQxONrKzwsNaNtsGIm5BxpL8gri1asHFQMW9',
+  sn: 0, // TODO hex string
   ilk: 'icp',
 }
 
 const ICP_key_config = {
   ilk  : 'icp',
   sith : 1,  // TODO hex string no leading zeros
-  keys : ["AaU6JR2nmwyZ-i0d8JZAoTNZH3ULvYAfSVPzhzS6b5CM"],  // list of qual Base64
+  keys : ["GA6NLmfIseQxONrKzwsNaNtsGIm5BxpL8gri1asHFQMW9"],
   next : "DZ-i0d8JZAoTNZH3ULvaU6JR2nmwyYAfSVPzhzS6b5CM",  // qualified Base64
 }
 
