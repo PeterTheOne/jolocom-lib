@@ -26,6 +26,7 @@ export declare class DidDocument implements IDigestable {
     addServiceEndpoint(endpoint: ServiceEndpointsSection): void;
     resetServiceEndpoints(): void;
     static fromPublicKey(publicKey: Buffer): DidDocument;
+    static fromPrefix(prefix: string): DidDocument;
     private prepareSignature;
     digest(): Promise<Buffer>;
     toJSON(): IDidDocumentAttrs;

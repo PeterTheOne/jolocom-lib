@@ -17,6 +17,8 @@ export class KEL {
     if (this.validate(ev)) {
       this.apply(ev)
     }
+
+    return false
   }
 
   // TODO
