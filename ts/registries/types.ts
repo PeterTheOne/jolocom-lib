@@ -28,6 +28,18 @@ export interface ISigner {
   keyId: string
 }
 
+/*
+ * We need a registry, and a registrar
+ * registrar: 
+ *  - createIdentity
+ *  - updateIdentity
+ *
+ *  registry:
+ *  - resolve
+ *
+ * fetchPublicProfile should not be a public method.
+ */
+
 export interface IRegistry {
   create: (
     vaultedKeyProvider: IVaultedKeyProvider,
