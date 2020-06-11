@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { BaseMetadata } from 'cred-types-jolocom-core';
 import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
@@ -6,7 +7,7 @@ import { Identity } from '../identity/identity';
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken';
 import { PaymentRequest } from '../interactionTokens/paymentRequest';
 import { CredentialRequest } from '../interactionTokens/credentialRequest';
-import { KeyTypes } from '../vaultedKeyProvider/types';
+import { KeyTypes, IKeyDerivationArgs } from '../vaultedKeyProvider/types';
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { ITransactionEncodable } from '../contracts/types';
 import { IRegistry } from '../registries/types';
@@ -47,6 +48,9 @@ export declare class IdentityWallet {
     private createPaymentResp;
     private initializeAndSign;
     validateJWT<T extends JWTEncodable, A extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<A>, customRegistry?: IRegistry): Promise<void>;
+    asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, customRegistry?: IRegistry) => Promise<string>;
+    asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
     private sendTransaction;
     transactions: {
         sendTransaction: (request: ITransactionEncodable, pass: string) => Promise<string>;
