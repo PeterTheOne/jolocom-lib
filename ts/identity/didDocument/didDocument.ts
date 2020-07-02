@@ -117,7 +117,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: 'authentication' })
-  @Transform(auths => auths.map(a => a.publicKey), {
+  @Transform(auths => auths.map(({publicKey}) => publicKey), {
     toClassOnly: true,
     until: 0.13,
   })
@@ -140,7 +140,13 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Type(() => PublicKeySection)
+  @Transform((val, obj) => plainToClass(
+    PublicKeySection,
+    val,
+    extractDidDocVersin(obj)
+  ), {
+    toClassOnly: true
+  })
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }
@@ -393,12 +399,16 @@ export class DidDocument implements IDigestable {
    */
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
-    const options: ClassTransformOptions | undefined = json.id.startsWith(
-      'did:jolo',
-    )
-      ? { version: json.specVersion || 0 }
-      : undefined
-
-    return plainToClass(DidDocument, json, options)
+    return plainToClass(DidDocument, json, extractDidDocVersin(json))
   }
+}
+
+const extractDidDocVersin = (didDoc: IDidDocumentAttrs | DidDocument) => {
+  const did = didDoc instanceof DidDocument ? didDoc.did : didDoc.id
+
+  const options: ClassTransformOptions | undefined = did.startsWith('did:jolo')
+    ? { version: didDoc.specVersion || 0 }
+    : undefined
+
+  return options
 }

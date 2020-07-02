@@ -26,9 +26,11 @@ export class PublicKeySection {
   /**
    * Get the did of the public key owner
    */
-
   @Expose()
-  @Transform((val, obj) => obj.owner, { toClassOnly: true, until: 0.13 })
+  @Transform((_, { owner }) => owner, {
+    toClassOnly: true,
+    until: 0.13
+  })
   public get controller(): string {
     return this._controller
   }
