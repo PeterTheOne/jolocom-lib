@@ -1,13 +1,15 @@
-import { BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata } from '@jolocom/protocol-ts'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
+import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
+import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import {
   IVaultedKeyProvider,
@@ -23,15 +25,15 @@ import {
   getIssuerPublicKey,
   publicKeyToAddress,
 } from '../utils/helper'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
+import { jolocomResolver } from '../registries/jolocomRegistry'
 import {
   IContractsAdapter,
   IContractsGateway,
   ITransactionEncodable,
 } from '../contracts/types'
-import { IRegistry } from '../registries/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
+import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   CredentialOfferRequestAttrs,
   CredentialOfferResponseAttrs,
@@ -42,7 +44,9 @@ import {
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
+import { DidDocument } from '../identity/didDocument/didDocument'
 import { ErrorCodes } from '../errors'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -279,13 +283,56 @@ export class IdentityWallet {
   private makeReq = <T>(typ: string) => (
     { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
-  ) => this.createMessage({ message, typ, expires, aud }, pass)
+  ) =>
+    this.createMessage(
+      {
+        // @ts-ignore
+        message: this.messageCannonicaliser(typ).fromJSON(message),
+        typ,
+        expires,
+        aud,
+      },
+      pass,
+    )
 
   private makeRes = <T, R>(typ: string) => (
     { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
-  ) => this.createMessage({ message, typ, expires, aud }, pass, recieved)
+  ) =>
+    this.createMessage(
+      {
+        // @ts-ignore
+        message: this.messageCannonicaliser(typ).fromJSON(message),
+        typ,
+        expires,
+        aud,
+      },
+      pass,
+      recieved,
+    )
+
+  private messageCannonicaliser = (typ: string) => {
+    switch (typ) {
+      case InteractionType.CredentialsReceive:
+        return CredentialsReceive
+      case InteractionType.CredentialOfferRequest:
+        return CredentialOfferRequest
+      case InteractionType.CredentialOfferResponse:
+        return CredentialOfferResponse
+      case InteractionType.CredentialRequest:
+        return CredentialRequest
+      case InteractionType.CredentialResponse:
+        return CredentialResponse
+      case InteractionType.Authentication:
+        return Authentication
+      case InteractionType.PaymentRequest:
+        return PaymentRequest
+      case InteractionType.PaymentResponse:
+        return PaymentResponse
+    }
+    throw new Error(ErrorCodes.JWTInvalidInteractionType)
+  }
 
   /**
    * Derives all public keys listed in the {@link KeyTypes} enum
@@ -347,23 +394,17 @@ export class IdentityWallet {
    * Validates interaction tokens for signatures, expiry, jti, and audience
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
-   * @param customRegistry - optional custom registry
+   * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. If none is provided, the
+   * default Jolocom contract is used for resolution.
    */
 
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
-    customRegistry?: IRegistry,
+    resolver = jolocomResolver(),
   ): Promise<void> {
-    const registry = customRegistry || createJolocomRegistry()
-    const remoteIdentity = await registry.resolve(
-      keyIdToDid(receivedJWT.issuer),
-    )
-
-    const pubKey = getIssuerPublicKey(
-      receivedJWT.issuer,
-      remoteIdentity.didDocument,
-    )
+    const result = convertDidDocToIDidDocumentAttrs(await resolver.resolve(keyIdToDid(receivedJWT.issuer)))
+    const pubKey = getIssuerPublicKey(receivedJWT.issuer, DidDocument.fromJSON(result))
 
     // First we make sure the signature on the interaction token is valid
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
@@ -408,21 +449,25 @@ export class IdentityWallet {
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
    * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
-   * @param customRegistry - optional registry to use for resolving the public key
+   * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
+   * default Jolocom contract is used for resolution.
    */
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
-    customRegistry?: IRegistry,
-  ) =>
-    this.asymEncrypt(
+    resolver = jolocomResolver(),
+  ) => this.asymEncrypt(
       data,
       getIssuerPublicKey(
         keyRef,
-        await (customRegistry || createJolocomRegistry())
-          .resolve(keyIdToDid(keyRef))
-          .then(target => target.didDocument),
-      ),
+        DidDocument.fromJSON(
+          convertDidDocToIDidDocumentAttrs(
+            await resolver.resolve(
+              keyIdToDid(keyRef)
+            )
+          )
+        )
+      )
     )
 
   /**
@@ -478,9 +523,20 @@ export class IdentityWallet {
         share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
         ),
-        payment: this.makeReq<PaymentRequestCreationArgs>(
-          InteractionType.PaymentRequest,
-        ),
+        payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => {
+          const { transactionOptions } = args
+
+          const withDefaults = {
+            gasLimit: 21000,
+            gasPrice: 10e9,
+            to: transactionOptions.to ||
+              publicKeyToAddress(
+                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
+            ),
+            ...transactionOptions
+          }
+
+          return this.makeReq<PaymentRequestCreationArgs>(InteractionType.PaymentRequest)({...args, transactionOptions: withDefaults} , pass)},
       },
       response: {
         auth: this.makeRes<
