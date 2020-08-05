@@ -1,5 +1,5 @@
-import { IVaultedKeyProvider } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider";
-import { Identity } from "../identity/identity";
+import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
+import { Identity } from '../identity/identity'
 
 /*
  * TODO - is the prefix required on all components, or just the DID Method?
